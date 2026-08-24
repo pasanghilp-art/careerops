@@ -537,7 +537,49 @@
 
 /* a11y: skip-to-content #20 */
 .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;background:var(--navy);color:#fff;padding:8px 12px;z-index:9999;border-radius:6px;text-decoration:none;font-weight:600}
-.skip-link:focus{left:8px;top:8px;width:auto;height:auto}</style></head><body>
+.skip-link:focus{left:8px;top:8px;width:auto;height:auto}
+  @media print {
+    body { background: #fff !important; color: #000 !important; }
+    /* Hide chrome */
+    #app, header, #mob_tabs, #status, #setupbanner, #cadence_nudge, #reconcile_banner, #followups, #triage, .scrim, .drawer, .modal, #auth, #onboard { display: none !important; }
+    
+    /* Builder print styles */
+    #builderView { position: static !important; background: #fff !important; height: auto !important; overflow: visible !important; }
+    .builder, .b-canvas, .paper {
+      display: block !important;
+      height: auto !important;
+      overflow: visible !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      background: #fff !important;
+    }
+    
+    /* Hide non-draft builder chrome */
+    .b-top, .b-nav, .b-rail, .verbar, .empty-build, .row, .shipped-box, .rp2-tl, #rp2_vers, #rp2_verscount, .lbl, #rp2_edtitle, p.muted, .review-box, .ats-box {
+      display: none !important;
+    }
+    
+    #rp2_editor { display: block !important; }
+    
+    /* Style the textarea for clean print output */
+    #rp2_edtext {
+      width: 100% !important;
+      height: auto !important;
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      color: #000 !important;
+      font-size: 11pt !important;
+      line-height: 1.5 !important;
+      resize: none !important;
+      overflow: visible !important;
+      white-space: pre-wrap !important;
+      field-sizing: content;
+    }
+  }
+</style></head><body>
 <a class="skip-link" href="#stage">Skip to main content</a>
 
 <!-- =========== AUTH =========== -->
@@ -1049,6 +1091,7 @@
           <button id="rp2_edmatch">Re-check match</button>
           <button id="rp2_review">Review draft</button>
           <button id="rp2_eddl">⬇︎ Word (.doc)</button>
+          <button id="rp2_edprint">🖨 Print / PDF</button>
           <button id="rp2_edclose" class="hidden">Close</button>
           <button id="rp2_humanize" class="hidden">Humanize</button>
         </div>

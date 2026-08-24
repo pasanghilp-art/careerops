@@ -3053,6 +3053,18 @@ $('rp2_humanize').onclick=async()=>{
   b.disabled=false; b.textContent=o
 }
 $('rp2_eddl').onclick=()=>{ if(RP2EDIT) dlDoc(rpName(RP2EDIT.kind), $('rp2_edtext').value) }
+$('rp2_edprint').onclick=()=>{ if(RP2EDIT) window.print() }
+window.addEventListener('beforeprint', () => {
+  const ed=$('rp2_edtext');
+  if(ed && !ed.closest('.hidden')) {
+    ed.style.height = 'auto';
+    ed.style.height = ed.scrollHeight + 'px';
+  }
+});
+window.addEventListener('afterprint', () => {
+  const ed=$('rp2_edtext');
+  if(ed) ed.style.height = '';
+});
 
 // ---- Phase 2: pick what to use (deterministic parse of YOUR resume — no AI, you confirm it) ----
 function rp2LooksEdu(t){

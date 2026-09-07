@@ -1,5 +1,30 @@
 export const byId = (id) => document.getElementById(id)
 
+export const createFocusTrap = (modalEl, openerEl) => {
+  const focusables = modalEl.querySelectorAll('button, input, textarea, select, a[href]')
+  const first = focusables[0]
+  const last = focusables[focusables.length - 1]
+  first?.focus()
+
+  function handleKeydown(e) {
+    if (e.key !== 'Tab') return
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault()
+      last?.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first?.focus()
+    }
+  }
+
+  modalEl.addEventListener('keydown', handleKeydown)
+
+  return function releaseFocusTrap() {
+    modalEl.removeEventListener('keydown', handleKeydown)
+    openerEl?.focus()
+  }
+}
+
 export const escapeHtml = (value) => String(value || '').replace(
   /[&<>"]/g,
   (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[character],

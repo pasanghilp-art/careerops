@@ -96,7 +96,7 @@ import {
 import {
   buildTriageRoleRow, buildMatchReportRow, splitGapsByMaterials, validateTriageAdd, inferRoleLevel,
 } from './board.mjs'
-import { byId, escapeHtml, commaList } from './primitives.mjs'
+import { byId, escapeHtml, commaList, createFocusTrap } from './primitives.mjs'
 import {
   createOpenaiPrefsStore,
   providerSecretOnFile,
@@ -1583,18 +1583,26 @@ board.addEventListener('click',e=>{ if(suppressClick) return; if(e.target.closes
 
 // ---- role panel: JD auto-load → scan / tailor / cover / jobscan / download / apply ----
 let CURROLE=null, RPKIND='resume'
-$('rp_close').onclick=()=> $('rolepanel').classList.add('hidden')
+let releaseRolePanelTrap = null;
+$('rp_close').onclick=()=> {
+  $('rolepanel').classList.add('hidden')
+  releaseRolePanelTrap?.()
+}
 async function openRole(id){
   if(APP_SECTION!=='board') showAppSection('board')
   if(NEWPANEL) return openRole2(id)
+  const opener = document.activeElement
   CURROLE=findRole(id); if(!CURROLE) return
   id=roleIdOf(CURROLE.id)
   logEvent('role_open', id)
   $('rp_title').textContent=CURROLE.title; $('rp_co').textContent=(CURROLE.company||'')+(CURROLE.match_score?' · '+CURROLE.match_score+' match':'')
   $('rp_apply').style.display = CURROLE.url ? '' : 'none'; if(CURROLE.url) $('rp_apply').href=CURROLE.url
   $('rp_err').textContent=''; $('rp_matchout').classList.add('hidden'); $('rp_out').classList.add('hidden')
+ 
   $('rp_jd').value=''; $('rp_jobscan').value=''; $('rp_jdstate').textContent='· loading job description…'
   $('rolepanel').classList.remove('hidden')
+  releaseRolePanelTrap = createFocusTrap($('rolepanel'),opener);
+
   loadSaved(id)
   if(CURROLE.jd){
     if(jdRejectReason(CURROLE.jd)){
@@ -1620,6 +1628,20 @@ async function openRole(id){
     }catch(_e){ $('rp_jdstate').textContent='· couldn’t auto-load — paste the JD here and it saves to the card automatically' }
   } else $('rp_jdstate').textContent='· no link on this card — paste the JD here and it saves to the card automatically'
 }
+
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Escape') return
+  if(!$('builderView')?.classList.contains('hidden')){ closeBuilder(); return }
+  if(!$('drawer')?.classList.contains('hidden')){
+    if(!$('rp2_jdwrap')?.classList.contains('hidden')) return
+    rp2FlushSel(); closeDrawer()
+  }
+  if(!$('rolepanel')?.classList.contains('hidden')){
+    $('rolepanel').classList.add('hidden')
+    releaseRolePanelTrap?.()
+    return
+  }
+})
 async function saveJd(role, jd){
   role.jd=jd
   if(ROLESMAP[role.id]) ROLESMAP[role.id].jd=jd
@@ -3970,6 +3992,9 @@ function guessCompanyFromHost(url){
     return h.split('.')[0].replace(/-/g,' ')
   }catch(_e){ return 'Unknown' }
 }
+
+let releaseligoogle = null
+
 function openLiGoogleModal(){
   const { q }=liSearchBits()
   if($('li_query_preview')) $('li_query_preview').textContent='Google query: site:linkedin.com/jobs/view '+q
@@ -3977,9 +4002,27 @@ function openLiGoogleModal(){
   if($('li_jd_bulk')) $('li_jd_bulk').value=''
   if($('li_err')) $('li_err').textContent=''
   $('ligoogle')?.classList.remove('hidden')
+  releaseligoogle = createFocusTrap($('ligoogle'),$('li_google_btn'))
 }
 $('li_google_btn')&&($('li_google_btn').onclick=()=>openLiGoogleModal())
-$('li_close')&&($('li_close').onclick=()=>$('ligoogle').classList.add('hidden'))
+$('li_close')&&($('li_close').onclick=()=> {$('ligoogle').classList.add('hidden')
+releaseligoogle?.()
+})
+
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Escape') return
+  if(!$('builderView')?.classList.contains('hidden')){ closeBuilder(); return }
+  if(!$('drawer')?.classList.contains('hidden')){
+    if(!$('rp2_jdwrap')?.classList.contains('hidden')) return
+    rp2FlushSel(); closeDrawer()
+  }
+  if(!$('ligoogle')?.classList.contains('hidden')){
+    $('ligoogle').classList.add('hidden')
+    releaseligoogle?.()
+    return
+  }
+})
+
 $('li_open_google')&&($('li_open_google').onclick=()=>window.open(liGoogleUrl(),'_blank','noopener'))
 $('li_open_native')&&($('li_open_native').onclick=()=>window.open(liNativeUrl(),'_blank','noopener'))
 $('li_import')&&($('li_import').onclick=async()=>{
@@ -4028,12 +4071,31 @@ $('li_import')&&($('li_import').onclick=async()=>{
   finally{ b.disabled=false; b.textContent=t }
 })
 
+let releaseAddroleTrap = null;
 $('addrolebtn').onclick=()=>{
   $('ar_company').value=''; $('ar_title').value=''; $('ar_url').value=''
   if($('ar_jd')) $('ar_jd').value=''
-  $('ar_err').textContent=''; $('addrole').classList.remove('hidden'); $('ar_company').focus()
+  $('ar_err').textContent=''; $('addrole').classList.remove('hidden');
+  releaseAddroleTrap = createFocusTrap($('addrole'),$('addrolebtn'))
 }
-$('ar_close').onclick=()=> $('addrole').classList.add('hidden')
+$('ar_close').onclick=()=> {
+  $('addrole').classList.add('hidden')
+  releaseAddroleTrap?.()
+}
+
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Escape') return
+  if(!$('builderView')?.classList.contains('hidden')){ closeBuilder(); return }
+  if(!$('drawer')?.classList.contains('hidden')){
+    if(!$('rp2_jdwrap')?.classList.contains('hidden')) return
+    rp2FlushSel(); closeDrawer()
+  }
+  if(!$('addrole')?.classList.contains('hidden')){
+    $('addrole').classList.add('hidden')
+    releaseAddroleTrap?.()
+    return
+  }
+})
 /** Shared Add-role insert — blocklist, dedupe, JD reject/format, ghost risk. */
 async function insertManualRoleOnBoard({ company, title, url, jd, stage }){
   if(!company||!title) return { error:'Company and job title are required.' }
@@ -4095,16 +4157,36 @@ function jtSyncAddEnabled(){
 ;['jt_company','jt_title','jd'].forEach(id=>{
   const el=$(id); if(el) el.addEventListener('input', jtSyncAddEnabled)
 })
+
+let releasejdtriageTrap = null;
 $('jdtriagebtn').onclick=()=>{
   TRIAGE_LAST_MATCH=null
   $('jdtriage').classList.remove('hidden')
+  releasejdtriageTrap = createFocusTrap($('jdtriage'),$('jdtriagebtn'))
   $('matchout').classList.add('hidden')
   $('resumeerr').textContent=''
   if($('jt_gaps')) $('jt_gaps').innerHTML=''
   jtSyncAddEnabled()
-  $('jd')?.focus()
 }
-$('jdtriageclose').onclick=()=> $('jdtriage').classList.add('hidden')
+$('jdtriageclose').onclick=()=> {
+  $('jdtriage').classList.add('hidden')
+  releasejdtriageTrap?.()
+}
+
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Escape') return
+  if(!$('builderView')?.classList.contains('hidden')){ closeBuilder(); return }
+  if(!$('drawer')?.classList.contains('hidden')){
+    if(!$('rp2_jdwrap')?.classList.contains('hidden')) return
+    rp2FlushSel(); closeDrawer()
+  }
+  if(!$('jdtriage')?.classList.contains('hidden')){
+    $('jdtriage').classList.add('hidden')
+    releasejdtriageTrap?.()
+    return
+  }
+})
+
 $('matchbtn').onclick = async ()=>{
   $('resumeerr').textContent=''
   const jd=($('jd')?.value||'').trim()
@@ -4176,6 +4258,9 @@ function paintSettingsSecrets(){
   if(ks) ks.innerHTML = painted.keysHtml
   if(hs) hs.innerHTML = painted.humanHtml
 }
+
+let releaseSettingsTrap = null;
+
 $('settingsbtn').onclick=()=>{
   FIND_PREFS = loadFindPrefs()
   $('s_titles').value=(PROFILE?.target_titles||[]).join(', ')
@@ -4219,8 +4304,27 @@ $('settingsbtn').onclick=()=>{
       : (FIND_PREFS.max_age_days===0 ? 'Max age 0 = no age limit. Soft-hide only affects Sourced.' : '')
   }
   $('settings').classList.remove('hidden')
+  releaseSettingsTrap = createFocusTrap($('settings'),$('settingsbtn'))
 }
-$('settingsclose').onclick=()=> $('settings').classList.add('hidden')
+
+$('settingsclose').onclick=()=> { $('settings').classList.add('hidden')
+releaseSettingsTrap?.()
+
+}
+
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Escape') return
+  if(!$('builderView')?.classList.contains('hidden')){ closeBuilder(); return }
+  if(!$('drawer')?.classList.contains('hidden')){
+    if(!$('rp2_jdwrap')?.classList.contains('hidden')) return
+    rp2FlushSel(); closeDrawer()
+  }
+  if(!$('settings')?.classList.contains('hidden')){
+    $('settings').classList.add('hidden')
+    releaseSettingsTrap?.()
+    return
+  }
+})
 $('exp_json').onclick = async ()=>{
   const [{data:prof},{data:roles},{data:reports}] = await Promise.all([
     sb.from('mt_profiles').select('*').eq('owner',ME.id),

@@ -1149,8 +1149,8 @@
 </div>
 
 <!-- add role modal -->
-<div id="addrole" class="modal hidden"><div class="box" style="max-width:560px">
-  <h2 style="margin:0 0 6px">Add a role</h2>
+<div id="addrole" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="ar_heading"><div class="box" style="max-width:560px">
+  <h2 id="ar_heading" style="margin:0 0 6px">Add a role</h2>
   <p class="muted" style="margin:0 0 10px">Found it on LinkedIn, a newsletter, or a friend? Paste the <b>link</b> and the <b>job description</b> — both save on the card. Don’t wait on auto-scrape.</p>
   <div class="row">
     <div><label>Company</label><input id="ar_company" placeholder="Marriott"></div>
@@ -1169,8 +1169,8 @@
 </div></div>
 
 <!-- LinkedIn via Google -->
-<div id="ligoogle" class="modal hidden"><div class="box" style="max-width:560px">
-  <h2 style="margin:0 0 6px">Find LinkedIn jobs</h2>
+<div id="ligoogle" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="li_heading"><div class="box" style="max-width:560px">
+  <h2 id="li_heading" style="margin:0 0 6px">Find LinkedIn jobs</h2>
   <p class="muted" style="margin:0 0 10px">No LinkedIn API — we open <b>Google</b> with <code>site:linkedin.com/jobs</code> using your titles/keywords/location from Settings. Pick roles there, then paste links + JDs below (or use <b>Add role</b>).</p>
   <div class="row" style="margin-bottom:10px;gap:8px;flex-wrap:wrap">
     <button class="primary" type="button" id="li_open_google">Open Google → LinkedIn jobs</button>
@@ -1189,8 +1189,8 @@
 </div></div>
 
 <!-- JD triage modal — score a posting not yet on the board, then Add to board -->
-<div id="jdtriage" class="modal hidden"><div class="box" style="max-width:640px">
-  <h2 style="margin:0 0 6px">Triage a JD</h2>
+<div id="jdtriage" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="jt_heading"><div class="box" style="max-width:640px">
+  <h2 id="jt_heading" style="margin:0 0 6px">Triage a JD</h2>
   <p class="muted" style="margin:0 0 10px">Paste a job description that isn’t on your board yet. Get a match score + gap split, then <b>Add to board</b> so the score lands on the card. Tailoring stays in the drawer — never auto-applies.</p>
   <div class="row">
     <div><label>Company <span class="h">for Add to board</span></label><input id="jt_company" placeholder="Marriott"></div>
@@ -1216,7 +1216,7 @@
 </div></div>
 
 <!-- role panel: click a card → JD auto-loads → scan / tailor / download / apply -->
-<div id="rolepanel" class="modal hidden"><div class="box">
+<div id="rolepanel" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="rp_title"><div class="box">
   <div style="display:flex;gap:10px;align-items:flex-start">
     <div style="flex:1"><h2 id="rp_title" style="margin:0;font-size:17px"></h2><p class="muted" id="rp_co" style="margin:2px 0 0"></p></div>
     <a id="rp_apply" href="#" target="_blank" rel="noopener" style="background:var(--green);color:#fff;border-radius:8px;padding:8px 12px;text-decoration:none;white-space:nowrap">Apply — Open JD ↗</a>
@@ -1263,8 +1263,8 @@
 <!-- rolepanel2 removed — drawer + builder (hybrid IA) -->
 
 <!-- settings modal -->
-<div id="settings" class="modal hidden"><div class="box">
-  <h2 style="margin:0 0 10px">Settings</h2>
+<div id="settings" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings_heading"><div class="box">
+  <h2 id="settings_heading" style="margin:0 0 10px">Settings</h2>
   <label>Target job titles</label><input id="s_titles">
   <label>Keywords</label><input id="s_keywords">
   <div class="row"><div><label>Seniority</label><input id="s_seniority"></div><div><label>Locations <span class="h">US / city / Remote — foreign-pinned Remote is blocked</span></label><input id="s_locations" placeholder="Remote, US, Chicago"></div></div>

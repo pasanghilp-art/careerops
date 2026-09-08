@@ -5,7 +5,7 @@
   "description": "CareerOps public repo — dashboard SPA + agent skill",
   "scripts": {
     "test": "node scripts/privacy-scan.mjs && node scripts/smoke-web.mjs && node scripts/test-nav-sections.mjs && node scripts/test-board-layout.mjs && node scripts/test-find-match.mjs && node scripts/test-career-os.mjs && node scripts/test-sample-board-pack.mjs && node scripts/test-schema-hardening.mjs && node scripts/test-promote-rpc.mjs && node scripts/test-credential-vault.mjs && node scripts/test-plugins.mjs && node scripts/test-chains.mjs && npm test --prefix packages/careerops",
-    "test:web": "node scripts/smoke-web.mjs && node scripts/test-nav-sections.mjs && node scripts/test-board-layout.mjs",
+    "test:web": "node scripts/smoke-web.mjs && node scripts/test-nav-sections.mjs && node scripts/test-board-layout.mjs && node scripts/test-modal-a11y.mjs",
     "test:nav": "node scripts/test-nav-sections.mjs",
     "test:board-layout": "node scripts/test-board-layout.mjs",
     "test:career-os": "node scripts/test-career-os.mjs",
@@ -23,7 +23,8 @@
     "deploy:functions": "bash scripts/deploy-functions.sh",
     "deploy:web": "bash scripts/deploy-web.sh",
     "pack:careerops": "npm pack --prefix packages/careerops",
-    "test:sample-pack": "node scripts/test-sample-board-pack.mjs"
+    "test:sample-pack": "node scripts/test-sample-board-pack.mjs",
+    "test:modal-a11y": "node scripts/test-modal-a11y.mjs"
   },
   "devDependencies": {
     "playwright": "^1.62.0"

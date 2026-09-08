@@ -120,6 +120,8 @@ const requiredStrings = [
   { name: 'ligoogle dialog name', re: /id="ligoogle"[^>]*aria-labelledby="li_heading"/ },
   { name: 'rolepanel dialog name', re: /id="rolepanel"[^>]*aria-labelledby="rp_title"/ },
   { name: 'modals use aria-modal', re: /id="settings"[^>]*aria-modal="true"/ },
+  { name: 'modal page inert helper', re: /function syncPageInert\(/ },
+  { name: 'modal backdrop click close', re: /e\.target === el\) closeModal\(/ },
   { name: 'no legacy Resume tool button', re: />📄 Resume tool</, invert: true },
   { name: 'no standalone Chat button', re: /id="chatbtn"/, invert: true },
   { name: 'no standalone chat modal', re: /Job-search chat/, invert: true },

@@ -116,18 +116,45 @@ const $ = byId
 const esc = escapeHtml
 const list = commaList
 let SELF_HOST_SETUP_ERROR = ''
-/** Per-modal focus-trap release fns (settings / addrole / jdtriage / ligoogle / rolepanel). */
+/** Modal ids that use the shared focus trap / Escape / backdrop close. */
+const MODAL_IDS = ['settings','jdtriage','addrole','ligoogle','rolepanel']
+/** Per-modal focus-trap release fns. */
 const modalRelease = Object.create(null)
+/** Per-modal backdrop-click teardown fns. */
+const modalBackdrop = Object.create(null)
+
+/** When a modal is open, mark every other body child inert so SR/tab can't reach the page behind. */
+function syncPageInert(openId){
+  for(const child of document.body.children){
+    if(!(child instanceof HTMLElement)) continue
+    if(openId && child.id === openId){ child.inert = false; continue }
+    child.inert = !!openId
+  }
+}
+function openModalId(){
+  return MODAL_IDS.find(id => { const el=$(id); return el && !el.classList.contains('hidden') }) || null
+}
+
 function trapModal(id, opener, focusEl){
   modalRelease[id]?.()
+  modalBackdrop[id]?.()
   const el=$(id); if(!el) return
   el.classList.remove('hidden')
+  syncPageInert(id)
+  const onBackdrop = (e)=>{ if(e.target === el) closeModal(id) }
+  el.addEventListener('click', onBackdrop)
+  modalBackdrop[id] = ()=> el.removeEventListener('click', onBackdrop)
   modalRelease[id]=createFocusTrap(el, opener||document.activeElement, focusEl||null)
 }
 function closeModal(id){
-  $(id)?.classList.add('hidden')
-  modalRelease[id]?.()
+  const el=$(id)
+  el?.classList.add('hidden')
+  modalBackdrop[id]?.(); modalBackdrop[id]=null
+  // Release inert before restoring focus — browsers ignore focus() into an inert subtree.
+  const release = modalRelease[id]
   modalRelease[id]=null
+  syncPageInert(openModalId())
+  release?.()
 }
 
 function selfHostSetupError(error){
@@ -4594,7 +4621,7 @@ document.addEventListener('keydown', e=>{
     if(!$('rp2_jdwrap')?.classList.contains('hidden')) return // keep paste session
     rp2FlushSel(); closeDrawer(); return
   }
-  for(const id of ['settings','jdtriage','addrole','ligoogle','rolepanel']){
+  for(const id of MODAL_IDS){
     if(!$(id)?.classList.contains('hidden')){ closeModal(id); return }
   }
 })
